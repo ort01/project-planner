@@ -5,7 +5,7 @@
       :currentFilter="currentFilter"
     />
     <!-- accesing the data "by" we sent through this.$emit("filterChange", by) with $event => $event = by -->
-    <div v-for="project in projects" :key="project.id">
+    <div v-for="project in filteredProjects" :key="project.id">
       <SingleProject
         :project="project"
         @delete="handleDelete"
@@ -51,7 +51,21 @@ export default {
     },
   },
   computed: {
-    filtteredObjects() {},
+    //every function inside computed property is considered as var/const
+    // if the filteredProjects function is in computed property (v-for="project in filteredProjects")
+    // if the filteredProjects function is in methods property (v-for="project in filteredProjects()")
+    filteredProjects() {
+      //function alwazs gives us back array
+      if (this.currentFilter === "completed") {
+        return this.projects.filter((project) => project.complete);
+        //returns every value thats true (only true values)
+      } else if (this.currentFilter === "ongoing") {
+        return this.projects.filter((project) => !project.complete);
+        //returns every value that is true (false => true, returns every item that had false initially; true => false, true values will be changed to false therefore they will not be returned.
+      } else {
+        return this.projects; //retruns whole array
+      }
+    },
   },
 };
 </script>
