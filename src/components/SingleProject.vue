@@ -1,0 +1,80 @@
+<template>
+  <div class="project" :class="{ complete: project.complete }">
+    <div class="actions">
+      <h3 @click="showDetails = !showDetails">{{ project.title }}</h3>
+      <div class="icons">
+        <span class="material-icons"> edit </span>
+        <span @click="deleteProject" class="material-icons"> delete </span>
+        <span @click="toggleComplete" class="material-icons tick"> done </span>
+      </div>
+    </div>
+    <div v-if="showDetails" class="details">
+      <p>{{ project.details }}</p>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "SingleProject",
+  props: ["project"],
+  data() {
+    return {
+      showDetails: false,
+      url: `http://localhost:3000/projects/${this.project.id}`,
+    };
+  },
+  methods: {
+    deleteProject() {
+      fetch(this.url, { method: "DELETE" }) //second argument is an options object with a method property with delete request
+        .then(() => this.$emit("delete", this.project.id))
+        .catch((error) => console.log(error.message));
+    },
+    toggleComplete() {
+      fetch(this.url, {
+        method: "PATCH", // passing on a second argument with multiple atrributes
+        headers: { "Content-Type": "application/json" }, // informations about the file we are sending - json apllication
+        body: JSON.stringify({ complete: !this.project.complete }), //what we are acti\ually sending ()
+      })
+        .then(() => this.$emit("complete", this.project.id))
+        .catch((err) => console.log(err));
+    },
+  },
+};
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+.project {
+  margin: 20px auto;
+  background: white;
+  padding: 10px 20px;
+  border-radius: 4px;
+  box-shadow: 1px 2px 3px rgb(0, 0, 0, 0.1);
+  border-left: 6px solid #e90074;
+}
+.project.complete {
+  border-left: 6px solid rgb(25, 192, 81);
+}
+.project h3 {
+  cursor: pointer;
+}
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.material-icons {
+  font-size: 20px;
+  margin-left: 10px;
+  color: #bbb;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.material-icons:hover {
+  color: #777;
+}
+.project.complete .tick {
+  color: rgb(25, 192, 81);
+}
+</style>
